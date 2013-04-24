@@ -60,7 +60,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="string-operate.h" />
+    <ClInclude Include="file-op.h" />
+    <ClInclude Include="string-op.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -1,5 +1,5 @@
-#ifndef ULTRA_STRING_OPERATE_H
-#define ULTRA_STRING_OPERATE_H
+#ifndef ULTRA_STRING_OP_H
+#define ULTRA_STRING_OP_H
 
 #include <Windows.h>
 #include <wchar.h>
@@ -11,7 +11,7 @@
 
 namespace ultra {
 	
-inline std::wstring _A2T( const std::string strOrigin )
+inline std::wstring _A2T( const std::string& strOrigin )
 {
 	std::wstring wstrTarget;
 	int nLen = MultiByteToWideChar(CP_ACP, 0, strOrigin.c_str(), strOrigin.length()+1, NULL, NULL);
@@ -26,7 +26,7 @@ inline std::wstring _A2T( const std::string strOrigin )
 	return wstrTarget;
 }
 
-inline std::string _T2A( const std::wstring wstrOrigin )
+inline std::string _T2A( const std::wstring& wstrOrigin )
 {
 	std::string strTarget;
 	int nLen = WideCharToMultiByte(CP_ACP, 0, wstrOrigin.c_str(), wstrOrigin.length()+1, NULL, NULL, NULL, NULL);
@@ -41,7 +41,7 @@ inline std::string _T2A( const std::wstring wstrOrigin )
 	return strTarget;
 }
 
-inline std::string _T2UTF( const std::wstring wstrOrigin )
+inline std::string _T2UTF( const std::wstring& wstrOrigin )
 {
 	std::string strTarget;
 	int nLen = WideCharToMultiByte(CP_UTF8, 0, wstrOrigin.c_str(), wstrOrigin.length()+1, NULL, NULL, NULL, NULL);
@@ -56,7 +56,7 @@ inline std::string _T2UTF( const std::wstring wstrOrigin )
 	return strTarget;
 }
 
-inline std::wstring _UTF2T( const std::string strOrigin )
+inline std::wstring _UTF2T( const std::string& strOrigin )
 {
 	std::wstring wstrTarget;
 	int nLen = MultiByteToWideChar(CP_UTF8, 0, strOrigin.c_str(), strOrigin.length()+1, NULL, NULL);
@@ -71,12 +71,12 @@ inline std::wstring _UTF2T( const std::string strOrigin )
 	return wstrTarget;
 }
 
-inline std::string _UTF2A( const std::string strOrigin )
+inline std::string _UTF2A( const std::string& strOrigin )
 {
 	return _T2A(_UTF2T(strOrigin));
 }
 
-inline std::string _A2UTF( const std::string strOrigin )
+inline std::string _A2UTF( const std::string& strOrigin )
 {
 	return _T2UTF(_A2T(strOrigin));
 }
@@ -120,17 +120,17 @@ inline int CompareWcharNoCase( wchar_t c1, wchar_t c2)
 	}
 }
 
-inline int CompareStringNoCase( const std::wstring wstrComp1, const std::wstring wstrComp2 )
+inline int CompareStringNoCase( const std::wstring& wstrComp1, const std::wstring& wstrComp2 )
 {
 	return ToUpper(wstrComp1).compare(ToUpper(wstrComp2));
 }
 
-inline int CompareStringNoCase( const std::string strComp1, const std::string strComp2 )
+inline int CompareStringNoCase( const std::string& strComp1, const std::string& strComp2 )
 {
 	return ToUpper(strComp1).compare(ToUpper(strComp2));
 }
 
-inline std::string ReplaceString( std::string& str, const std::string strSrc, const std::string strDst)
+inline std::string ReplaceString( std::string& str, const std::string& strSrc, const std::string& strDst)
 {
 	std::string::size_type nPos = 0;
 	std::string::size_type nSlen = strSrc.size();
@@ -145,7 +145,7 @@ inline std::string ReplaceString( std::string& str, const std::string strSrc, co
 	return str;
 }
 
-inline std::wstring ReplaceString( std::wstring& str, const std::wstring strSrc, const std::wstring strDst )
+inline std::wstring ReplaceString( std::wstring& str, const std::wstring& strSrc, const std::wstring& strDst )
 {
 	std::wstring::size_type nPos = 0;
 	std::wstring::size_type nSlen = strSrc.size();
@@ -175,6 +175,41 @@ static inline std::wstring ConvertToWString(T value)
 	ss << value;
 	return ss.str();
 }
+
+inline bool SplitString( const std::wstring wstrSrc, const std::wstring wstrSep, std::vector< std::wstring >* vec )
+{
+	if (wstrSrc.empty())
+	{
+		return false;
+	}
+	vec->clear();
+	if (wstrSep.empty())
+	{
+		vec->push_back(wstrSrc);
+		return true;
+	}
+
+	int nPos;
+	std::wstring wstrTmp(wstrSrc);
+	std::wstring wstrItem;
+	int nSepLen = wstrSep.length();
+	while ((nPos = wstrTmp.find(wstrSep)) != std::wstring::npos)
+	{
+		wstrItem = wstrTmp.substr(0, nPos);
+		if (!wstrItem.empty())
+		{
+			vec->push_back(wstrItem);
+		}
+		wstrTmp = wstrTmp.substr(nPos + nSepLen);
+	}
+
+	if (!wstrTmp.empty())
+	{
+		vec->push_back(wstrTmp);
+	}
+	return true;
+}
+
 
 }
 #endif
