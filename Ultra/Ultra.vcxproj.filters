@@ -13,10 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\encrypt">
+      <UniqueIdentifier>{833b9383-578d-4c18-9d4b-49e17f57ab94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="encrypt\md5.cpp">
+      <Filter>头文件\encrypt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +30,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="file-op.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="encrypt\md5.h">
+      <Filter>头文件\encrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="http.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
