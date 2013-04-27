@@ -161,7 +161,7 @@ inline std::wstring ReplaceString( std::wstring& str, const std::wstring& strSrc
 } 
 
 template <class T>
-static inline std::string ConvertToString(T value)
+inline std::string ConvertToString(T value)
 {
 	std::stringstream ss;
 	ss << value;
@@ -169,12 +169,33 @@ static inline std::string ConvertToString(T value)
 }
 
 template <class T>
-static inline std::wstring ConvertToWString(T value)
+inline std::wstring ConvertToWString(T value)
 {
 	std::wstringstream ss;
 	ss << value;
 	return ss.str();
 }
+
+template <class T1, class T2>
+inline T2 ConvertA(T1 value)
+{
+	std::stringstream ss;
+	ss << value;
+	T2 result;
+	ss >> result;
+	return result;
+}
+
+template <class T1, class T2>
+inline T2 Convert(T1 value)
+{
+	std::wstringstream ss;
+	ss << value;
+	T2 result;
+	ss >> result;
+	return result;
+}
+
 
 inline bool SplitString( const std::wstring wstrSrc, const std::wstring wstrSep, std::vector< std::wstring >* vec )
 {

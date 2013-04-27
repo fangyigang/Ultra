@@ -61,9 +61,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="encrypt\md5.h" />
+    <ClInclude Include="file-io.h" />
     <ClInclude Include="file-op.h" />
-    <ClInclude Include="http.h" />
+    <ClInclude Include="wininet-http.h" />
     <ClInclude Include="md5.h" />
+    <ClInclude Include="number.h" />
     <ClInclude Include="string-op.h" />
   </ItemGroup>
   <ItemGroup>

@@ -38,7 +38,13 @@
     <ClInclude Include="md5.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="http.h">
+    <ClInclude Include="number.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="file-io.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="wininet-http.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
