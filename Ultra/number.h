@@ -12,6 +12,10 @@ namespace ultra
 
 inline DWORD GetProgress(DWORD dwSmall, DWORD dwBig)
 {
+	if (dwBig == 0 && dwSmall == 0)
+	{
+		return 0;
+	}
 	if (dwSmall < 0 || dwBig <= 0)
 	{
 		return -1;

@@ -60,15 +60,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="encrypt\aes.h" />
     <ClInclude Include="encrypt\md5.h" />
     <ClInclude Include="file-io.h" />
     <ClInclude Include="file-op.h" />
+    <ClInclude Include="Firewall.h" />
+    <ClInclude Include="Updater.h" />
     <ClInclude Include="wininet-http.h" />
     <ClInclude Include="md5.h" />
     <ClInclude Include="number.h" />
     <ClInclude Include="string-op.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddFireWall.cpp" />
+    <ClCompile Include="encrypt\aes.cpp" />
     <ClCompile Include="encrypt\md5.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

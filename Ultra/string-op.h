@@ -122,12 +122,12 @@ inline int CompareWcharNoCase( wchar_t c1, wchar_t c2)
 
 inline int CompareStringNoCase( const std::wstring& wstrComp1, const std::wstring& wstrComp2 )
 {
-	return ToUpper(wstrComp1).compare(ToUpper(wstrComp2));
+	return wcsicmp(wstrComp1.c_str(), wstrComp2.c_str());
 }
 
 inline int CompareStringNoCase( const std::string& strComp1, const std::string& strComp2 )
 {
-	return ToUpper(strComp1).compare(ToUpper(strComp2));
+	return stricmp(strComp1.c_str(), strComp2.c_str());
 }
 
 inline std::string ReplaceString( std::string& str, const std::string& strSrc, const std::string& strDst)
@@ -227,6 +227,23 @@ inline bool SplitString( const std::wstring wstrSrc, const std::wstring wstrSep,
 	if (!wstrTmp.empty())
 	{
 		vec->push_back(wstrTmp);
+	}
+	return true;
+}
+
+inline bool SplitList( const std::wstring wstrSrc, const std::wstring wstrSep1, const std::wstring wstrSep2, std::vector< std::vector< std::wstring > >* vec )
+{
+	std::vector< std::wstring > tempVec, temp;
+	if (wstrSrc.empty())
+	{
+		return false;
+	}
+	vec->clear();
+	SplitString(wstrSrc, wstrSep1, &tempVec);
+	for (int i = 0; i < tempVec.size(); i++)
+	{
+		SplitString(tempVec.at(i), wstrSep2, &temp);
+		vec->push_back(temp);
 	}
 	return true;
 }

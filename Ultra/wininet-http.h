@@ -4,27 +4,30 @@
 #include <Windows.h>
 #include <string>
 #include <WinInet.h>
-#include "./number.h"
 #include "./file-io.h"
 
 #pragma comment(lib, "WinInet.lib")
 
 namespace ultra{
 
-enum HttpStatus
+namespace HttpStatus
 {
-	kSuccess           = 0,
-	kConnecting        = 1,
-	kDownloading       = 2,
-	kConnectFailure    = 3,
-	kDownloadFailure   = 4,
-	kCreateFileFailure = 5,
-	kWriteFileFailure  = 6,
-};
+
+	enum 
+	{
+		kSuccess           = 0,
+		kConnecting        = 1,
+		kDownloading       = 2,
+		kConnectFailure    = 3,
+		kDownloadFailure   = 4,
+		kCreateFileFailure = 5,
+		kWriteFileFailure  = 6,
+	};
+}
 
 struct IHttpCallback
 {
-	virtual void HttpHandle(int nStatus, int nProgress, const std::string& strContent) = 0;
+	virtual void HttpHandle(int nStatus, DWORD dwDlSize, DWORD dwFileSize, const std::string& strContent) = 0;
 };
 
 class WininetHttp
@@ -60,7 +63,7 @@ public:
 	bool DownloadString(const std::wstring& wstrUrl, IHttpCallback* httpCallback, unsigned nTimeout = 0)
 	{
 		m_httpCallback = httpCallback;
-		CallHttpHandle(HttpStatus::kConnecting, -1, "");
+		CallHttpHandle(HttpStatus::kConnecting, 0, 0, "");
 
 		if (!OpenHandles(wstrUrl, nTimeout))
 		{
@@ -71,7 +74,7 @@ public:
 		QueryInfoNumber(HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &dwStatus);
 		if (dwStatus >= 400)
 		{
-			CallHttpHandle(HttpStatus::kConnectFailure, -1, "");
+			CallHttpHandle(HttpStatus::kConnectFailure, 0, 0, "");
 			return false;
 		}
 
@@ -85,7 +88,7 @@ public:
 		DWORD dwRead = 0;
 		char* pBuf = NULL;
 		std::string strBuf;
-		int nProgress;
+		DWORD dwDl;
 		while (true)
 		{
 			if (0 == InternetQueryDataAvailable(m_hOpenUrl, &dwSize, 0, 0))
@@ -100,36 +103,21 @@ public:
 			if (InternetReadFile(m_hOpenUrl, pBuf, dwSize, &dwRead))
 			{
 				strBuf.append(pBuf, dwRead);
-				DWORD dwDl = strBuf.length();
-				if (dwContentLen > 0)
-				{
-					nProgress = ultra::GetProgress(strBuf.length(), dwContentLen);
-				}
-				else
-				{
-					nProgress = 0;
-				}
-				CallHttpHandle(HttpStatus::kDownloading, nProgress, "");
+				dwDl = strBuf.length();
+				CallHttpHandle(HttpStatus::kDownloading, dwDl, dwContentLen, "");
 			}
 			delete pBuf;
 			pBuf = NULL;
 		}
 
-		if (dwContentLen > 0)
+		if (strBuf.length() == dwContentLen)
 		{
-			if (strBuf.length() == dwContentLen)
-			{
-				CallHttpHandle(HttpStatus::kSuccess, nProgress, strBuf);
-			}
-			else
-			{
-				CallHttpHandle(HttpStatus::kDownloadFailure, nProgress, strBuf);
-				return false;
-			}
+			CallHttpHandle(HttpStatus::kSuccess, dwDl, dwContentLen, strBuf);
 		}
 		else
 		{
-			CallHttpHandle(HttpStatus::kSuccess, 100, strBuf);
+			CallHttpHandle(HttpStatus::kDownloadFailure, dwDl, dwContentLen, strBuf);
+			return false;
 		}
 		return true;
 	}
@@ -137,7 +125,7 @@ public:
 	bool DownloadFile(const std::wstring& wstrUrl, const std::wstring& wstrFilePath, IHttpCallback* httpCallback, unsigned nTimeout = 0)
 	{
 		m_httpCallback = httpCallback;
-		CallHttpHandle(HttpStatus::kConnecting, -1, "");
+		CallHttpHandle(HttpStatus::kConnecting, 0, 0, "");
 		if (!OpenHandles(wstrUrl, nTimeout))
 		{
 			return false;
@@ -147,14 +135,14 @@ public:
 		QueryInfoNumber(HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &dwStatus);
 		if (dwStatus >= 400)
 		{
-			CallHttpHandle(HttpStatus::kConnectFailure, -1, "");
+			CallHttpHandle(HttpStatus::kConnectFailure, 0, 0, "");
 			return false;
 		}
 
 		File file;
 		if (!file.Create(wstrFilePath))
 		{
-			CallHttpHandle(HttpStatus::kCreateFileFailure, -1, "");
+			CallHttpHandle(HttpStatus::kCreateFileFailure, 0, 0, "");
 			return false;
 		}
 
@@ -169,7 +157,6 @@ public:
 		DWORD dwReadTotal = 0;
 		DWORD dwWrite = 0;
 		char* pBuf = NULL;
-		int nProgress = -1;
 		bool bRet = true;
 		while (true)
 		{
@@ -186,38 +173,22 @@ public:
 			{
 				if (!file.Write(pBuf, dwRead, &dwWrite))
 				{
-					CallHttpHandle(HttpStatus::kWriteFileFailure, nProgress, "");
+					CallHttpHandle(HttpStatus::kWriteFileFailure, file.GetSize(), dwContentLen, "");
 					return false;
 				}
-				if (dwContentLen > 0)
-				{
-					nProgress = GetProgress(file.GetSize(), dwContentLen);
-				}
-				else
-				{
-					nProgress = 0;
-				}
-				CallHttpHandle(HttpStatus::kDownloading, nProgress, "");
+				CallHttpHandle(HttpStatus::kDownloading, file.GetSize(), dwContentLen, "");
 			}
 			delete[] pBuf;
 		}
-		if (dwContentLen > 0)
+		if (file.GetSize() == dwContentLen)
 		{
-			if (file.GetSize() == dwContentLen)
-			{
-				file.Close();
-				CallHttpHandle(HttpStatus::kSuccess, nProgress, "");
-			}
-			else
-			{
-				CallHttpHandle(HttpStatus::kDownloadFailure, nProgress, "");
-				return false;
-			}
+			CallHttpHandle(HttpStatus::kSuccess, file.GetSize(), dwContentLen, "");
+			file.Close();
 		}
 		else
 		{
-			file.Close();
-			CallHttpHandle(HttpStatus::kSuccess, 100, "");
+			CallHttpHandle(HttpStatus::kDownloadFailure, file.GetSize(), dwContentLen, "");
+			return false;
 		}
 		return true;
 	}
@@ -269,11 +240,11 @@ private:
 		return (0 != HttpQueryInfo(m_hOpenUrl, dwFlags, dwNum, &dwSize, NULL));
 	}
 
-	void CallHttpHandle(int nStatus, int nProgress, const std::string& strContent)
+	void CallHttpHandle(int nStatus, DWORD dwDlSize, DWORD dwFileSize, const std::string& strContent)
 	{
 		if (m_httpCallback != NULL)
 		{
-			m_httpCallback->HttpHandle(nStatus, nProgress, strContent);
+			m_httpCallback->HttpHandle(nStatus, dwDlSize, dwFileSize, strContent);
 		}
 	}
 

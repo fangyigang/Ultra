@@ -24,6 +24,12 @@
     <ClCompile Include="encrypt\md5.cpp">
       <Filter>头文件\encrypt</Filter>
     </ClCompile>
+    <ClCompile Include="AddFireWall.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="encrypt\aes.cpp">
+      <Filter>头文件\encrypt</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="string-op.h">
@@ -45,6 +51,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="wininet-http.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Firewall.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="encrypt\aes.h">
+      <Filter>头文件\encrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Updater.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
